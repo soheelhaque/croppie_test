@@ -1,0 +1,9 @@
+{% block content %}
+    <a href="/">Back to Image Gallery</a>
+    <br/><br/>
+    <img src="{{ image.cropped_photo.url }}" style="max-width:1000px;max-height:1250px">
+    <figcaption>{{ image.description }} (cropped)</figcaption>
+    <br/><br/>
+    <img src="{{ image.photo.url }}" style="max-width:1000px;max-height:1250px">
+    <figcaption>{{ image.description }}</figcaption>
+{% endblock %}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+      <style>
+          body {font-family: Arial, Helvetica, sans-serif;}
+
+          /* Image file input field */
+          .image-upload>input {
+              display: none;
+              /* Use the following instead if not working in some browsers
+              visibility: hidden;
+              width: 0;
+              height: 0;*/
+          }
+
+
+          * {box-sizing: border-box}
+
+          /* Container needed to position the overlay. Adjust the width as needed */
+            .croppie-photo-container {
+            position: relative;
+            width: 100%;
+            max-width: 1500px;
+          }
+
+          /* The overlay effect - lays on top of the container and over the image */
+          .overlay {
+            position: absolute;
+            bottom: 0;
+            background: rgb(0, 0, 0);
+            background: rgba(0, 0, 0, 0.5); /* Black see-through */
+            color: #f1f1f1;
+            width: 100%;
+            height: 100%;
+            transition: .5s ease;
+            opacity:0;
+            z-index: 1000;
+          }
+
+          .loader {
+            border: 10px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 10px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+            z-index: 10000;
+          }
+
+          .loader_container {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%)
+          }
+
+          /* When you mouse over the container, fade in the overlay title */
+          /*.modal-body:hover .overlay {
+              opacity: 0;
+          }*/
+
+          /* Safari */
+          @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+          }
+
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+
+      </style>
+
+        <title>Upload Image</title>
+        {% load static %}
+        <!--JQuery-->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!--Bootstrap-->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <!--Croppie-->
+        <link href="{%static 'my_croppie/css/croppie.css' %}" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="{%static 'my_croppie/js/croppie.js' %}"></script>
+        <!--Fontawesome-->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+       <script type="text/javascript">
+            $(document).ready(function() {
+
+                function readFile(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var bindPromise = crop_tool.croppie('bind', {
+                            url: e.target.result
+                        });
+                        bindPromise.then(function() {
+                            $('.overlay').css('opacity', '0');
+                        });
+                        $('.id_photo_display').addClass('ready');
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                        $('#id_croppie_modal').modal('show');
+                    }
+
+                }
+
+                function closeModal() {
+                    // We need to reset the photo input field on the main page
+                    // otherwise 1) uploading the same photo won't re-open the modal
+                    // 2) user can cancel the modal and still save the image
+                    $('#id_photo').val('');
+                }
+
+                var crop_tool = $('#id_croppie_photo').croppie({
+                    viewport: {
+                        width: 400,
+                        height: 400,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 450,
+                        height: 450
+                    }
+                });
+
+                crop_tool.croppie('bind', {
+                    // make sure that the media context processor is enabled in the TEMPLATE section of the settings file
+                    url: "{{ MEDIA_URL }}images/default.jpg",
+                    points: [0,1500,1500,0],
+                });
+
+                $('#id_photo').on('change', function () {
+                    $('.overlay').css('opacity', '1');
+                    readFile(this);
+                });
+
+                // Get the <span> element that closes the modal
+                var span = document.getElementsByClassName("close")[0];
+
+                // Get the close button
+                var close = document.getElementsByClassName("btn btn-secondary")[0];
+
+                // Get the crop button
+                var crop = document.getElementsByClassName("btn btn-primary")[0];
+
+                // When the user clicks on the crop button, set the hidden field and the image on the main page
+                crop.onclick = function() {
+                    crop_tool.croppie('result',{
+                        type: 'base64',
+                        circle: false
+                    }).then(function(resp) {
+                        $('#id_cropped_photo').val(resp);
+                        $('#id_photo_display')[0].src = resp;
+                    // $('#id_form').submit();
+                    });
+                    $('#id_croppie_modal').modal('hide');
+                };
+
+                // When the user clicks on <span> (x), close the modal
+                span.onclick = function() {
+                    closeModal();
+                };
+
+                // When the user clicks on the close button, close the modal
+                close.onclick = function() {
+                    closeModal();
+                };
+
+                // When the user clicks anywhere outside of the modal, close it
+                // window.onclick = function(event) {
+                //    if (event.target == modal) {
+                //        closeModal();
+                //    }
+                // };
+            });
+        </script>
+    </head>
+    <body>
+
+    <!-- The upload page -->
+        <div id="page">
+            <h1>Upload Image</h1>
+            <br/><br/>
+            <div>
+                <form action="" method="POST" enctype="multipart/form-data" id="id_form">
+                    {% csrf_token %}
+                    <div style="position:relative;">
+                        <img src="{{ MEDIA_URL }}images/default.jpg" id="id_photo_display" style="width:250px; height:250px; display:block;"></img>
+                        <div id="id_edit_img_btn" class="image-upload" role="button">
+                            <label for="id_photo">
+                                <i class="fas fa-edit" style="position:absolute; bottom:25px; left:235px; color: Dodgerblue;" id="id_edit_icon"></i>
+                            </label>
+                            <input type="file" name="photo" accept="image/*" required="" id="id_photo">
+                        </div>
+                    </div>
+                    <br/><br/>
+                    <br/><br/>
+                    <label for="id_description">Description:</label>
+                    <input type="text" name="description" maxlength="255" required="" id="id_description">
+                    <input type="hidden" name="cropped_photo" required="" id="id_cropped_photo">
+                    <br/><br/>
+                    <input type="submit">
+                </form>
+            </div>
+        </div>
+
+    <!-- The modal -->
+        <div id="id_croppie_modal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document" style="min-width: 700px">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Crop Your Image</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <!--<span class="close">&times;</span>-->
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-12 text-center">
+                            <div class="croppie-photo-container">
+                                <div id="id_croppie_photo"></div>
+                                <div class="overlay">
+                                    <div class="loader_container">
+                                        <div class="loader"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Crop and Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
