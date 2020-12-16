@@ -196,7 +196,7 @@
                 <form action="" method="POST" enctype="multipart/form-data" id="id_form">
                     {% csrf_token %}
                     <div style="position:relative;">
-                        <img src="{{ MEDIA_URL }}images/default.jpg" id="id_photo_display" style="width:250px; height:250px; display:block;"></img>
+                        <img src="{{ MEDIA_URL }}images/default.jpg" id="id_photo_display" style="width:250px; height:250px; display:block; border-radius:50%"></img>
                         <div id="id_edit_img_btn" class="image-upload" role="button">
                             <label for="id_photo">
                                 <i class="fas fa-edit" style="position:absolute; bottom:25px; left:235px; color: Dodgerblue;" id="id_edit_icon"></i>
