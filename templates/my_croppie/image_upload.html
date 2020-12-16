@@ -34,7 +34,7 @@
             width: 100%;
             height: 100%;
             transition: .5s ease;
-            opacity:0;
+            opacity:1;
             z-index: 1000;
           }
 
@@ -99,7 +99,9 @@
                             url: e.target.result
                         });
                         bindPromise.then(function() {
-                            $('.overlay').css('opacity', '0');
+                            //$('.overlay').css('opacity', '0');
+                            $('.overlay').hide();
+                            $(".btn.btn-primary").prop("disabled", false);
                         });
                         $('.id_photo_display').addClass('ready');
                         }
@@ -135,7 +137,9 @@
                 });
 
                 $('#id_photo').on('change', function () {
-                    $('.overlay').css('opacity', '1');
+                    //$('.overlay').css('opacity', '1');
+                    $('.overlay').show();
+                    $(".btn.btn-primary").prop("disabled", true);
                     readFile(this);
                 });
 
@@ -148,6 +152,9 @@
                 // Get the crop button
                 var crop = document.getElementsByClassName("btn btn-primary")[0];
 
+                // Get the modal
+                var modal = document.getElementById("#id_croppie_modal");
+
                 // When the user clicks on the crop button, set the hidden field and the image on the main page
                 crop.onclick = function() {
                     crop_tool.croppie('result',{
@@ -156,7 +163,6 @@
                     }).then(function(resp) {
                         $('#id_cropped_photo').val(resp);
                         $('#id_photo_display')[0].src = resp;
-                    // $('#id_form').submit();
                     });
                     $('#id_croppie_modal').modal('hide');
                 };
@@ -172,11 +178,11 @@
                 };
 
                 // When the user clicks anywhere outside of the modal, close it
-                // window.onclick = function(event) {
-                //    if (event.target == modal) {
-                //        closeModal();
-                //    }
-                // };
+                 window.onclick = function(event) {
+                    if (event.target == modal) {
+                        closeModal();
+                    }
+                 };
             });
         </script>
     </head>
