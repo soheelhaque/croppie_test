@@ -3,7 +3,7 @@
 {% block content %}
     {% for image in image_list %}
         <a href="images/{{ image.id }}">
-            <img src="{{ image.cropped_photo.url }}" style="width:200px;"></a>
+            <img src="{{ image.cropped_photo.url }}" style="width:200px; border-radius:50%"></a>
         <figcaption>{{ image.description }}</figcaption>
         <br>
     {% endfor %}
