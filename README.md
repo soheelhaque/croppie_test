@@ -13,5 +13,5 @@ This demo assumes that you have some basic familiarity with Django and Pycharm.
 6. You can access the website at http://127.0.0.1:8000
 7. You can access the admin page at http://127.0.0.1:8000. To login, you will need to create an admin user by running "createsuperuser" in manage.py
   
-&copy Soheel Haque-Everding
+&copy;Soheel Haque-Everding 2020
 This software is intended for personal use only, and the author accepts no liability or responsibility related to your usage of it.
